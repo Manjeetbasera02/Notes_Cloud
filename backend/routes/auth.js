@@ -4,31 +4,70 @@ const router = express.Router()
 const User = require('../models/User')
 // import body and validationResult from express-validator
 const {body, validationResult} = require('express-validator')
+// import bcrypt 
+const bcrypt = require('bcryptjs')
+// import jsonwebtoken
+const jwt = require('jsonwebtoken')
 
-// GET for login
-router.get('/', 
-    [
-        // apply validation here 
-        body('email', 'Enter a valid email').isEmail(),
-        body('name', 'Enter a valid name').isLength({ min: 3}),
-        body('password').isLength({ min: 5})
-    ], (req, res) => {
-        // send error is it is not valid
-        const errors = validationResult(req)
-        if(!errors.isEmpty) {
-            return res.send(400).json({ errors: errors.array() })
+// put for signup
+
+router('/singup', async (req, res) => {
+    // req.body has {name, email, password}
+    const { name, email, password } = req.body
+
+    try {
+
+        // check email already present or not 
+        const existemail = User.findOne({email})
+
+        if(existemail) {
+            return res.status(400).send({error: "user already exist"})
         }
-    // data is in req.body in object
-    console.log(req.body)
-    const user = new User(req.body)
-    user.save()   // async nature , use await 
-    res.send(req.body)
-    res.send('logging in.......')
+
+        // hash password  using bcrypt and salt
+
+        // generate salt 
+        var salt = bcrypt.genSalt(10);
+
+        var hash_password = bcrypt.hash(password, salt)
+
+        // store name, email, hash_password in data base 
+
+        const user = new User({name, email, password: hash_password})
+
+        await user.save()
+
+        res.status(201).send({message: "user created successfully"})
+    }
+
+    catch (error) {
+        return res.status(401).send({error: `server error: $(error)`})
+    }
 })
 
-// PUT for logout
-router.put('/', (req, res) => {
-    res.send('logging out.......')
-})
+// put for login 
+router.put('/login', async (req, res) => {
+    const { email, password } = req.body
 
-module.exports = router;
+    // check this user with this eamil exist or not 
+
+    const user = User.findOne({email})
+
+    if(!user) {
+        return res.status(400).json({error: "user does not exist"})
+    }
+
+    // fetch the stored hash_password value for this email user 
+    const hashed_password = user.password
+
+    // verify password 
+
+    const isMatch = await bcrypt.compare(password, hashed_password)
+
+    if(!isMatch) {
+        return res.status(401).json({error: "enter correct information"})
+    }
+
+    // generate jwt token 
+
+})
