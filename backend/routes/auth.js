@@ -21,15 +21,15 @@ router('/singup', async (req, res) => {
         const existemail = User.findOne({email})
 
         if(existemail) {
-            return res.status(400).send({error: "user already exist"})
+            return res.status(400).json({error: "user already exist"})
         }
 
         // hash password  using bcrypt and salt
 
         // generate salt 
-        var salt = bcrypt.genSalt(10);
+        var salt = await bcrypt.genSalt(10);
 
-        var hash_password = bcrypt.hash(password, salt)
+        var hash_password = await bcrypt.hash(password, salt)
 
         // store name, email, hash_password in data base 
 
@@ -37,11 +37,14 @@ router('/singup', async (req, res) => {
 
         await user.save()
 
-        res.status(201).send({message: "user created successfully"})
+        // create token 
+        const token = jwt.sign({userId: user.id}, "secret_key")
+
+        res.status(200).json({token})
     }
 
     catch (error) {
-        return res.status(401).send({error: `server error: $(error)`})
+        return res.status(500).send({error: `server error: ${error.message}`})
     }
 })
 
@@ -69,5 +72,21 @@ router.put('/login', async (req, res) => {
     }
 
     // generate jwt token 
+    const token = jwt.sign({userId: user.id}, "secret_key")
 
+    res.status(200).json({token})
+})
+
+// get for userdetails
+router.get('/getuser', async (req, res) => {
+    try {
+        // req has user id 
+        const user = await User.findById(req.id).select("-password")
+
+        res.status(200).json({user})
+    }
+
+    catch (error) {
+        res.status(500).json({error: `internal server error, ${error.message}`})
+    }
 })
