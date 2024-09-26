@@ -8,17 +8,19 @@ const {body, validationResult} = require('express-validator')
 const bcrypt = require('bcryptjs')
 // import jsonwebtoken
 const jwt = require('jsonwebtoken')
+// import middleware to fetch user id
+const fetchuser = require('../middleware/fetchuser')
 
 // put for signup
 
-router('/singup', async (req, res) => {
+router.put('/signup', async (req, res) => {
     // req.body has {name, email, password}
+    console.log(req.body)
     const { name, email, password } = req.body
 
     try {
-
         // check email already present or not 
-        const existemail = User.findOne({email})
+        const existemail = await User.findOne({email})
 
         if(existemail) {
             return res.status(400).json({error: "user already exist"})
@@ -35,10 +37,14 @@ router('/singup', async (req, res) => {
 
         const user = new User({name, email, password: hash_password})
 
+        console.log(user)
+
         await user.save()
 
+        console.log(user)
+
         // create token 
-        const token = jwt.sign({userId: user.id}, "secret_key")
+        const token = jwt.sign({userId: user._id}, "secret_key")
 
         res.status(200).json({token})
     }
@@ -54,7 +60,7 @@ router.put('/login', async (req, res) => {
 
     // check this user with this eamil exist or not 
 
-    const user = User.findOne({email})
+    const user = await User.findOne({email})
 
     if(!user) {
         return res.status(400).json({error: "user does not exist"})
@@ -72,16 +78,17 @@ router.put('/login', async (req, res) => {
     }
 
     // generate jwt token 
-    const token = jwt.sign({userId: user.id}, "secret_key")
+    const token = jwt.sign({userId: user._id}, "secret_key")
 
     res.status(200).json({token})
 })
 
 // get for userdetails
-router.get('/getuser', async (req, res) => {
+router.get('/getuser', fetchuser, async (req, res) => {
     try {
-        // req has user id 
-        const user = await User.findById(req.id).select("-password")
+        console.log(req.user.userId)
+        // req.user has user id 
+        const user = await User.findById(req.user.userId).select("-password")
 
         res.status(200).json({user})
     }
@@ -90,3 +97,5 @@ router.get('/getuser', async (req, res) => {
         res.status(500).json({error: `internal server error, ${error.message}`})
     }
 })
+
+module.exports = router
