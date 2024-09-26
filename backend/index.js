@@ -11,10 +11,10 @@ const authRouter = require('./routes/auth')
 app.use(express.json())
 
 // mount the router on the /notes path
-app.use('/notes', notesRouter)
+app.use('/note', notesRouter)
 
 // mount the router on the /user path
-app.use('/user', authRouter)
+app.use('/auth', authRouter)
 
 const PORT = 3000
 
