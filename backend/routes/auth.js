@@ -46,6 +46,9 @@ router.put('/signup', async (req, res) => {
         // create token 
         const token = jwt.sign({userId: user._id}, "secret_key")
 
+        // add this token in header 
+        res.header('token', token)
+
         res.status(200).json({token})
     }
 

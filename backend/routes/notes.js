@@ -83,7 +83,7 @@ router.delete('/deletenote/:id', fetchuser, async (req, res) => {
         }
 
         else {
-            res.status(400).json({error: "not deleted"})
+            res.status(400).json({error: "note not exist"})
         }
     } 
     
@@ -99,7 +99,11 @@ router.delete('/deleteallnotes', fetchuser, async (req, res) => {
     try {
         const { userId } = req.user
 
-        const deletedall = await deleteMany({user: userId})
+        console.log(`hello ${userId}`)
+
+        const deletedall = await Note.deleteMany({user: userId})
+
+        console.log(deletedall)
 
         if(deletedall) {
             res.status(200).json({deletedall})

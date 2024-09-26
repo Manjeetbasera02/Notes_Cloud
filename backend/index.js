@@ -12,14 +12,14 @@ else {
     console.log("something wrong with database connection")
 }
 
-// const notesRouter = require('./routes/notes')
+const notesRouter = require('./routes/notes')
 const authRouter = require('./routes/auth')
 
 // middleware to parse incoming json requests
 app.use(express.json())
 
 // mount the router on the /notes path
-// app.use('/note', notesRouter)
+app.use('/note', notesRouter)
 
 // mount the router on the /user path
 app.use('/auth', authRouter)
