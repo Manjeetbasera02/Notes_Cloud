@@ -1,6 +1,10 @@
 const express = require('express')
 const app = express()
 const connectToMongo = require('./db')
+const cors = require('cors')
+
+const notesRouter = require('./routes/notes')
+const authRouter = require('./routes/auth')
 
 const connected = connectToMongo()
 
@@ -12,8 +16,8 @@ else {
     console.log("something wrong with database connection")
 }
 
-const notesRouter = require('./routes/notes')
-const authRouter = require('./routes/auth')
+// cors middleware to allow requests
+app.use(cors())
 
 // middleware to parse incoming json requests
 app.use(express.json())

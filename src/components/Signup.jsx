@@ -17,9 +17,32 @@ function Signup() {
     })
   }
 
-  const handlesubmit = (e) => {
-    console.log('form submitted', data)
+  const handlesubmit = async(e) => {
     e.preventDefault()
+    console.log('form submitted', data)
+
+    const url = "http://localhost:3000/auth/signup"
+
+    const response = await fetch(url, {
+      method: 'PUT',
+
+      headers: {
+        'Content-Type': 'application/json',  // Tell the server that the request body is JSON
+      },
+
+      body: JSON.stringify(data)
+    });
+
+    const json = await response.json()
+
+    console.log(json)
+
+    // set token in local storage 
+
+    if(response.ok) {
+      localStorage.setItem('token', json.token)
+    }
+
   }
   
   return (
