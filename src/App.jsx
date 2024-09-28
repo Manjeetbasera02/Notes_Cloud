@@ -8,22 +8,25 @@ import Home from './components/Home'
 import About from './components/About'
 import Signup from './components/Signup'
 import Login from './components/Login'
+import { Contextprovider } from './context/Usercontext'
 
 function App() {
 
   return (
    <>
-    <BrowserRouter>
+   <Contextprovider>
+      <BrowserRouter>
 
-      <Navbar />
-      <Routes>
-          <Route path='/' element={<Home />}/>
-          <Route path='/About' element={<About />}/>
-          <Route path='/Login' element={<Login/>} />
-          <Route path='/Signup' element={<Signup/>} />
-      </Routes>
+        <Navbar />
+        <Routes>
+            <Route path='/' element={<Home />}/>
+            <Route path='/About' element={<About />}/>
+            <Route path='/Login' element={<Login/>} />
+            <Route path='/Signup' element={<Signup/>} />
+        </Routes>
 
-    </BrowserRouter>
+      </BrowserRouter>
+    </Contextprovider>
    </>
   )
 }

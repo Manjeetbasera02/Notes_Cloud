@@ -1,8 +1,11 @@
 import React from 'react'
+import Allnotes from './Allnotes'
 
 function Home() {
   return (
-    <div>Home</div>
+    <>
+      <Allnotes />
+    </>
   )
 }
 
