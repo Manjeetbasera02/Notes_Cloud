@@ -79,7 +79,7 @@ router.delete('/deletenote/:id', fetchuser, async (req, res) => {
         const deletednote = await Note.findByIdAndDelete(req.params.id)
 
         if(deletednote) {
-            res.status(400).json(deletednote)
+            res.status(200).json(deletednote)
         }
 
         else {
