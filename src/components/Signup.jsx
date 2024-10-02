@@ -75,9 +75,15 @@
 
 // export default Signup
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { Link } from 'react-router-dom'; // Import Link from React Router
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Import react-toastify styles
+import { usercontext } from '../context/Usercontext';
 
 function Signup() {
+  const {user, setuser} = useContext(usercontext)
+
   const [data, setData] = useState({
     name: '',
     email: '',
@@ -98,21 +104,40 @@ function Signup() {
 
     const url = 'http://localhost:3000/auth/signup';
 
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json' // Tell the server that the request body is JSON
-      },
-      body: JSON.stringify(data)
-    });
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json' // Tell the server that the request body is JSON
+        },
+        body: JSON.stringify(data)
+      });
 
-    const json = await response.json();
-    console.log(json);
+      const json = await response.json();
+      console.log(json);
 
-    // Set token in local storage
-    if (response.ok) {
-      localStorage.setItem('token', json.token);
+      // Set token in local storage
+      
+      if (response.ok) {
+        toast.success('Account created successfully!');
+
+        // delay to display toast message
+
+        setTimeout(() => {
+          localStorage.setItem('token', json.token);
+          setuser(json.token)
+        }, 1000)
+      }
+
+      else {
+        toast.error('Signup failed! Please try again.');
+      }
     }
+
+    catch (error) {
+      toast.error('Unable to connect to the server. Please try again later.');
+    }
+
   };
 
   return (
@@ -172,11 +197,24 @@ function Signup() {
                 <button type="submit" className="btn btn-success w-100">Sign Up</button>
               </div>
             </form>
+
+            {/* Link to Login Page */}
+            <div className="text-center mt-3">
+              <p className="mb-0">
+                Already have an account?{' '}
+                <Link to="/login" className="text-primary">Login here</Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Toast Container for displaying toast notifications */}
+      <ToastContainer />
+
+  </div>
   );
 }
 
 export default Signup;
+
